@@ -10,7 +10,7 @@ import streamlit as st
 from labs.util.trigonometry import cos_rounded, sin_rounded
 
 
-@dataclass(frozen=True)
+@dataclass
 class Vector2D:
     x: float
     y: float
@@ -44,6 +44,9 @@ class Vector2D:
 
     def __matmul__(self, other: Vector2D) -> float:
         return self.x * other.x + self.y * other.y
+
+    def __neg__(self) -> Vector2D:
+        return Vector2D(-self.x, -self.y)
 
     def rotate(self, delta_angle: float) -> Vector2D:
         norm, angle = self.to_polar()
