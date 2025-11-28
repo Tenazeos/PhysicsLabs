@@ -46,17 +46,14 @@ class Calculator:
                 distance: Vector2D = self.molecules[i].position - self.molecules[j].position
 
                 if 0 < distance.norm < self.molecules_radius * 2:
-                    distance = distance * (1 / distance.norm)
+                    normal = distance / distance.norm
 
-                    projection_i = distance * (self.molecules[i].velocity @ distance)
-                    projection_j = distance * (self.molecules[j].velocity @ distance)
+                    projection_i = normal * (self.molecules[i].velocity @ normal)
+                    projection_j = normal * (self.molecules[j].velocity @ normal)
 
                     self.molecules[i].velocity += -projection_i + projection_j
                     self.molecules[j].velocity += -projection_j + projection_i
 
-                    self.molecules[i].position += Vector2D(
-                        self.molecules_radius, self.molecules_radius
-                    )
-                    self.molecules[j].position += Vector2D(
-                        self.molecules_radius, self.molecules_radius
-                    )
+                    overlap = self.molecules_radius * 2 - distance.norm
+                    self.molecules[i].position -= distance * (overlap / 2)
+                    self.molecules[j].position += distance * (overlap / 2)
