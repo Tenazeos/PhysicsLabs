@@ -75,3 +75,32 @@ def trajectory_to_df(trajectory_data: list[tuple[Vector2D, Vector2D]]) -> pd.Dat
             for index, (point, velocity) in enumerate(trajectory_data)
         ]
     )
+
+
+@dataclass
+class Vector3D:
+    x: float
+    y: float
+    z: float
+
+    def __add__(self, other: Vector3D) -> Vector3D:
+        return Vector3D(self.x + other.x, self.y + other.y, self.z + other.z)
+
+    def __sub__(self, other: Vector3D) -> Vector3D:
+        return Vector3D(self.x - other.x, self.y - other.y, self.z - other.z)
+
+    def __mul__(self, scalar: float) -> Vector3D:
+        return Vector3D(self.x * scalar, self.y * scalar, self.z * scalar)
+
+    def __neg__(self) -> Vector3D:
+        return Vector3D(-self.x, -self.y, -self.z)
+
+    def __truediv__(self, scalar: float) -> Vector3D:
+        return Vector3D(self.x / scalar, self.y / scalar, self.z / scalar)
+
+    @cached_property
+    def norm(self) -> float:
+        return math.sqrt(self.x**2 + self.y**2 + self.z**2)
+
+    def __matmul__(self, other: Vector3D) -> float:
+        return self.x * other.x + self.y * other.y + self.z * other.z

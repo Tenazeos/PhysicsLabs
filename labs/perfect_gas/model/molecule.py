@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 
-from labs.model.vector import Vector2D
+from labs.model.vector import Vector3D
 
 
 @dataclass(slots=True)
 class Molecule:
-    velocity: Vector2D
-    position: Vector2D
+    velocity: Vector3D
+    position: Vector3D
