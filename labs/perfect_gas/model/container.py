@@ -21,7 +21,7 @@ class Wall:
     area: float
     position: SurfacePosition
     mass: float = 1  # gramms
-    energy: float = 0  # milijoules
+    energy: float = 0  # milijoules / mole
 
     @property
     def velocity(self) -> Vector3D:

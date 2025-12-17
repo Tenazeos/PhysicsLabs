@@ -10,7 +10,7 @@ from labs.perfect_gas.model.container import Wall
 def collide_with_wall(wall: Wall, molecule: Molecule, molecule_mass: float) -> None:
     local_wall_velocity = get_randomized_velocity(wall)
     previous_molecule_velocity = molecule.velocity
-    molecule.velocity = molecule.velocity + 2 * local_wall_velocity
+    molecule.velocity = 2 * local_wall_velocity - molecule.velocity
 
     transfered_energy = (
         molecule_mass * (molecule.velocity.norm**2 - previous_molecule_velocity.norm**2) / 2
