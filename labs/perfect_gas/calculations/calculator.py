@@ -1,7 +1,5 @@
-import copy
-
 from labs.model.constant import GAS_CONSTANT, g
-from labs.perfect_gas.model import Container, Experiment, Molecule, SystemState
+from labs.perfect_gas.model import Container, Experiment, Molecule
 
 from ...model.vector import Vector3D
 from .initialization import StartStateGenerator
@@ -14,7 +12,6 @@ class Calculator:
     container: Container
     settings: Experiment
     molecules: list[Molecule]
-    current_state: SystemState
 
     def __init__(
         self,
@@ -29,24 +26,31 @@ class Calculator:
 
         self.enable_gravity = enable_gravity
 
-        self.current_state = SystemState(temperature=self._calculate_temperature(), pressure=0.0)
+        self.delta_vel_per_wall = {
+            "x+": 0.0,
+            "x-": 0.0,
+            "y+": 0.0,
+            "y-": 0.0,
+            "z+": 0.0,
+            "z-": 0.0,
+        }
+
+        self.current_time = 0.0
+
+        self.hit_with_wall_count = 0
+        self.hit_inner_count = 0
 
     def step(self, time_delta: float) -> None:
         self._process_movement(time_delta)
-        delta_vel = self._process_container_collisions()
+        self._process_container_collisions()
         self._process_inner_collision()
 
-        self.current_state = SystemState(
-            temperature=self._calculate_temperature(),
-            pressure=self._calculate_pressure(time_delta, delta_vel),
-        )
-
-    def get_state(self) -> SystemState:
-        return copy.copy(self.current_state)
+        self.current_time += time_delta
 
     def _process_movement(self, time_delta: float) -> None:
         for molecule in self.molecules:
             if self.enable_gravity:
+                # gravity in nanometer per nanosecond in square
                 molecule.velocity += (
                     Vector3D(
                         x=0.0,
@@ -57,38 +61,46 @@ class Calculator:
                 )
             molecule.position += molecule.velocity * time_delta
 
-    def _process_container_collisions(self) -> dict[str, float]:
-        delta_vel = {"x+": 0.0, "x-": 0.0, "y+": 0.0, "y-": 0.0, "z+": 0.0, "z-": 0.0}
-
+    def _process_container_collisions(self) -> None:
         for molecule in self.molecules:
             if molecule.position.x - self.settings.radius <= 0:
-                delta_vel["x-"] += abs(molecule.velocity.x)
+                self.delta_vel_per_wall["x-"] += abs(molecule.velocity.x)
                 molecule.velocity.x *= -1
                 molecule.position.x = self.settings.radius
+
+                self.hit_with_wall_count += 1
             elif molecule.position.x + self.settings.radius >= self.container.length:
-                delta_vel["x+"] += abs(molecule.velocity.x)
+                self.delta_vel_per_wall["x+"] += abs(molecule.velocity.x)
                 molecule.velocity.x *= -1
                 molecule.position.x = self.container.length - self.settings.radius
 
+                self.hit_with_wall_count += 1
+
             if molecule.position.y - self.settings.radius <= 0:
-                delta_vel["y-"] += abs(molecule.velocity.y)
+                self.delta_vel_per_wall["y-"] += abs(molecule.velocity.y)
                 molecule.velocity.y *= -1
                 molecule.position.y = self.settings.radius
+
+                self.hit_with_wall_count += 1
             elif molecule.position.y + self.settings.radius >= self.container.width:
-                delta_vel["y+"] += abs(molecule.velocity.y)
+                self.delta_vel_per_wall["y+"] += abs(molecule.velocity.y)
                 molecule.velocity.y *= -1
                 molecule.position.y = self.container.width - self.settings.radius
 
+                self.hit_with_wall_count += 1
+
             if molecule.position.z - self.settings.radius <= 0:
-                delta_vel["z-"] += abs(molecule.velocity.z)
+                self.delta_vel_per_wall["z-"] += abs(molecule.velocity.z)
                 molecule.velocity.z *= -1
                 molecule.position.z = self.settings.radius
+
+                self.hit_with_wall_count += 1
             elif molecule.position.z + self.settings.radius >= self.container.height:
-                delta_vel += abs(molecule.velocity.z)
+                self.delta_vel_per_wall["z+"] += abs(molecule.velocity.z)
                 molecule.velocity.z *= -1
                 molecule.position.z = self.container.height - self.settings.radius
 
-        return delta_vel
+                self.hit_with_wall_count += 1
 
     def _process_inner_collision(self) -> None:
         for i in range(len(self.molecules)):
@@ -105,6 +117,8 @@ class Calculator:
                     if (mol2.velocity - mol1.velocity) @ normal > 0:
                         continue
 
+                    self.hit_inner_count += 1
+
                     projection_first = normal * (normal @ mol1.velocity)
                     projection_second = normal * (normal @ mol2.velocity)
 
@@ -120,7 +134,8 @@ class Calculator:
                         mol1.position -= separation
                         mol2.position += separation
 
-    def _calculate_temperature(self) -> float:
+    @property
+    def temperature(self) -> float:
         average_square_velocity: float = 0.0
 
         for molecule in self.molecules:
@@ -131,37 +146,38 @@ class Calculator:
         # millikelvins
         return self.settings.molar_mass * average_square_velocity / (3 * GAS_CONSTANT)
 
-    def _calculate_pressure(self, time_delta: float, delta_vel: dict[str, float]) -> float:
+    @property
+    def pressure(self) -> float:
         pressures = {
-            "x+": delta_vel["x+"]
+            "x+": self.delta_vel_per_wall["x+"]
             * self.settings.molar_mass
             / SPECIAL_AVOGADRO
-            / time_delta
+            / self.current_time
             / (self.container.height * self.container.width),
-            "x-": delta_vel["x-"]
+            "x-": self.delta_vel_per_wall["x-"]
             * self.settings.molar_mass
             / SPECIAL_AVOGADRO
-            / time_delta
+            / self.current_time
             / (self.container.height * self.container.width),
-            "y+": delta_vel["y+"]
+            "y+": self.delta_vel_per_wall["y+"]
             * self.settings.molar_mass
             / SPECIAL_AVOGADRO
-            / time_delta
+            / self.current_time
             / (self.container.length * self.container.height),
-            "y-": delta_vel["y-"]
+            "y-": self.delta_vel_per_wall["y-"]
             * self.settings.molar_mass
             / SPECIAL_AVOGADRO
-            / time_delta
+            / self.current_time
             / (self.container.length * self.container.height),
-            "z+": delta_vel["z+"]
+            "z+": self.delta_vel_per_wall["z+"]
             * self.settings.molar_mass
             / SPECIAL_AVOGADRO
-            / time_delta
+            / self.current_time
             / (self.container.length * self.container.width),
-            "z-": delta_vel["z-"]
+            "z-": self.delta_vel_per_wall["z-"]
             * self.settings.molar_mass
             / SPECIAL_AVOGADRO
-            / time_delta
+            / self.current_time
             / (self.container.length * self.container.width),
         }
 
