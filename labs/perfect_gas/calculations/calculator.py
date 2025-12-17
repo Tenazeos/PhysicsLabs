@@ -1,8 +1,10 @@
 from labs.model.constant import GAS_CONSTANT, g
 from labs.perfect_gas.model import Container, Experiment, Molecule
+from labs.perfect_gas.model.container import Wall
+from labs.perfect_gas.model.orientation import SurfacePosition
 
 from ...model.vector import Vector3D
-from .collision import collide_mollecules
+from .collision import collide_mollecules, collide_with_wall
 from .initialization import StartStateGenerator
 
 # avogadro without exp
@@ -19,11 +21,13 @@ class Calculator:
         container: Container,
         settings: Experiment,
         generator: StartStateGenerator,
-        enable_gravity: bool,  # noqa
+        *,
+        enable_gravity: bool,
     ) -> None:
         self.container = container
         self.settings = settings
         self.molecules = list(generator)
+        self.molecule_mass = settings.molar_mass / (1e23 * SPECIAL_AVOGADRO)  # gramms
 
         self.enable_gravity = enable_gravity
 
@@ -34,6 +38,18 @@ class Calculator:
             "y-": 0.0,
             "z+": 0.0,
             "z-": 0.0,
+        }
+
+        z_size = container.height
+        y_size = container.width
+        x_size = container.length
+        self.walls: dict[SurfacePosition, Wall] = {
+            "x+": Wall(area=y_size * z_size, position="x+"),
+            "x-": Wall(area=y_size * z_size, position="x-"),
+            "y+": Wall(area=x_size * z_size, position="y+"),
+            "y-": Wall(area=x_size * z_size, position="y-"),
+            "z+": Wall(area=x_size * y_size, position="z+"),
+            "z-": Wall(area=x_size * y_size, position="z-"),
         }
 
         self.current_time = 0.0
@@ -66,42 +82,45 @@ class Calculator:
         for molecule in self.molecules:
             if molecule.position.x - self.settings.radius <= 0:
                 self.delta_vel_per_wall["x-"] += abs(molecule.velocity.x)
-                molecule.velocity.x *= -1
+                self.hit_with_wall_count += 1
+
+                collide_with_wall(self.walls["x-"], molecule, self.molecule_mass)
                 molecule.position.x = self.settings.radius
 
-                self.hit_with_wall_count += 1
             elif molecule.position.x + self.settings.radius >= self.container.length:
                 self.delta_vel_per_wall["x+"] += abs(molecule.velocity.x)
-                molecule.velocity.x *= -1
-                molecule.position.x = self.container.length - self.settings.radius
-
                 self.hit_with_wall_count += 1
+
+                collide_with_wall(self.walls["x+"], molecule, self.molecule_mass)
+                molecule.position.x = self.container.length - self.settings.radius
 
             if molecule.position.y - self.settings.radius <= 0:
                 self.delta_vel_per_wall["y-"] += abs(molecule.velocity.y)
-                molecule.velocity.y *= -1
+                self.hit_with_wall_count += 1
+
+                collide_with_wall(self.walls["y-"], molecule, self.molecule_mass)
                 molecule.position.y = self.settings.radius
 
-                self.hit_with_wall_count += 1
             elif molecule.position.y + self.settings.radius >= self.container.width:
                 self.delta_vel_per_wall["y+"] += abs(molecule.velocity.y)
-                molecule.velocity.y *= -1
-                molecule.position.y = self.container.width - self.settings.radius
-
                 self.hit_with_wall_count += 1
+
+                collide_with_wall(self.walls["y+"], molecule, self.molecule_mass)
+                molecule.position.y = self.container.width - self.settings.radius
 
             if molecule.position.z - self.settings.radius <= 0:
                 self.delta_vel_per_wall["z-"] += abs(molecule.velocity.z)
-                molecule.velocity.z *= -1
+                self.hit_with_wall_count += 1
+
+                collide_with_wall(self.walls["z-"], molecule, self.molecule_mass)
                 molecule.position.z = self.settings.radius
 
-                self.hit_with_wall_count += 1
             elif molecule.position.z + self.settings.radius >= self.container.height:
                 self.delta_vel_per_wall["z+"] += abs(molecule.velocity.z)
-                molecule.velocity.z *= -1
-                molecule.position.z = self.container.height - self.settings.radius
-
                 self.hit_with_wall_count += 1
+
+                collide_with_wall(self.walls["z+"], molecule, self.molecule_mass)
+                molecule.position.z = self.container.height - self.settings.radius
 
     def _process_inner_collision(self) -> None:
         for i in range(len(self.molecules)):

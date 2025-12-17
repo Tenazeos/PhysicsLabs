@@ -92,6 +92,9 @@ class Vector3D:
     def __mul__(self, scalar: float) -> Vector3D:
         return Vector3D(self.x * scalar, self.y * scalar, self.z * scalar)
 
+    def __rmul__(self, scalar: float) -> Vector3D:
+        return self * scalar
+
     def __neg__(self) -> Vector3D:
         return Vector3D(-self.x, -self.y, -self.z)
 
