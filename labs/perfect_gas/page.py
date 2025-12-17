@@ -12,7 +12,7 @@ from .model.container import Container
 
 
 def page() -> None:
-    st.set_page_config(page_title="Perfect Gas ☁", page_icon="☁", layout="wide")
+    st.set_page_config(page_title="Perfect gas ☁", page_icon="☁", layout="wide")
 
     st.title("Perfect Gas ☁️")
 

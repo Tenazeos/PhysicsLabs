@@ -35,7 +35,7 @@ pages = [
     ),
     st.Page(
         perfect_gas_page,
-        title="Perfect Gas",
+        title="Perfect gas",
         icon="☁️",
         url_path="perfect-gas",
     ),

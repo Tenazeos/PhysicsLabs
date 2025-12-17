@@ -16,6 +16,7 @@ Try out interactive labs **right now**, on our [website](https://hsse-physics-la
 - **M2. Flight to Mars** · [General information](labs/flight_to_mars) · [Tests](tests/flight_to_mars)
 - **M4. Roll the ball** · [General information](labs/roll_the_ball) · [Tests](tests/roll_the_ball)
 - **M5. Swing the pendulum** · [General information](labs/swing_the_pendulum) · [Tests](tests/swing_the_pendulum)
+- **M7. Perfect gas** · [General information](labs/perfect_gas) · [Tests](tests/perfect_gas)
 
 
 ## Launch guide
