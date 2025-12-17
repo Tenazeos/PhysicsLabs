@@ -82,8 +82,6 @@ class Calculator:
             molecule.position += molecule.velocity * time_delta
 
     def _process_container_collisions(self) -> None:
-        # st.write(sum(wall.energy for wall in self.walls.values()))
-
         for molecule in self.molecules:
             if molecule.position.x - self.settings.radius <= 0:
                 self.delta_vel_per_wall["x-"] += abs(molecule.velocity.x)
@@ -211,3 +209,12 @@ class Calculator:
                 (pressures["x+"] + pressures["x-"] + pressures["y+"] + pressures["y-"]) / 4 / 1e2
             ),
         }
+
+    def get_molecule_heights(self) -> list[float]:
+        return [molecule.position.z for molecule in self.molecules]
+
+    def get_molecule_speeds_x(self) -> list[float]:
+        return [molecule.velocity.x for molecule in self.molecules]
+
+    def get_molecule_speeds_y(self) -> list[float]:
+        return [molecule.velocity.y for molecule in self.molecules]

@@ -12,6 +12,8 @@ from .model.container import Container
 
 
 def page() -> None:
+    st.set_page_config(page_title="Perfect Gas ☁", page_icon="☁", layout="wide")
+
     st.title("Perfect Gas ☁️")
 
     with st.sidebar:
@@ -34,7 +36,7 @@ def page() -> None:
             concentration_exponent = st.selectbox(
                 "<no label>",
                 options=range(21, 28),
-                index=3,  # ^24
+                index=4,  # ^24
                 format_func=lambda exp: f"×10{str(exp).translate(superscript_digits)}",
                 label_visibility="hidden",
                 width=100,
@@ -107,6 +109,7 @@ def page() -> None:
         with st.expander("Calculated parameters", expanded=True):
             st.html(f"Container base side length: <b>{container.length:.2f} nm</b>")
             st.html(f"Container height: <b>{container.height:.2f} nm</b>")
+            st.html(f"Container volume: <b>{scientific_superscript(volume)} nm³</b>")
 
         with st.expander("Constants used"):
             st.html(f"g = {g} m/s<sup>2</sup>")
@@ -126,7 +129,9 @@ def page() -> None:
             f"Total time: <b>{scientific_superscript(time_delta * steps)} ns</b>"
         )
 
-        start_vel = [m.velocity.norm for m in calculator.molecules]
+        start_heights = calculator.get_molecule_heights()
+        start_speeds_x = calculator.get_molecule_speeds_x()
+        start_speeds_y = calculator.get_molecule_speeds_y()
 
         progress_bar = st.progress(0)
         status_text = st.empty()
@@ -162,24 +167,70 @@ def page() -> None:
                     width="content",
                 )
 
-        col1, col2 = st.columns(2)
+        hist_col1, hist_col2 = st.columns(2)
 
-        with col1:
-            fig = px.histogram(
-                x=start_vel,
-                title="Velocity module distribution at the start",
-                labels={"x": "Velocity module, m/s", "y": "Count"},
+        with hist_col1:
+            st.subheader("At the start")
+
+            figure = px.histogram(
+                x=start_speeds_x,
+                nbins=60,
+                color_discrete_sequence=["#1f77b4"],
+                title="Maxwell distribution (X)",
+                labels={"x": "X velocity, m/s", "y": "Count"},
             )
-            fig.update_layout(showlegend=False, bargap=0.1)
+            figure.update_layout(showlegend=False, bargap=0.1)
+            st.plotly_chart(figure, key="start_x")
 
-            st.plotly_chart(fig)
-
-        with col2:
-            fig = px.histogram(
-                x=[m.velocity.norm for m in calculator.molecules],
-                title="Velocity module distribution at the end",
-                labels={"x": "Velocity module, м/с", "y": "Count"},
+            figure = px.histogram(
+                x=start_speeds_y,
+                nbins=60,
+                color_discrete_sequence=["#00bb54"],
+                title="Maxwell distribution (Y)",
+                labels={"x": "Y velocity, m/s", "y": "Count"},
             )
-            fig.update_layout(showlegend=False, bargap=0.1)
+            figure.update_layout(showlegend=False, bargap=0.1)
+            st.plotly_chart(figure, key="start_y")
 
-            st.plotly_chart(fig)
+            figure = px.histogram(
+                x=start_heights,
+                nbins=60,
+                color_discrete_sequence=["#ff7f0e"],
+                title="Boltzmann distribution",
+                labels={"x": "Z coordinate, nm", "y": "Count"},
+            )
+            figure.update_layout(showlegend=False, bargap=0.1)
+            st.plotly_chart(figure, key="start_z")
+
+        with hist_col2:
+            st.subheader("At the end")
+
+            figure = px.histogram(
+                x=calculator.get_molecule_speeds_x(),
+                nbins=60,
+                color_discrete_sequence=["#1f77b4"],
+                title="Maxwell distribution (X)",
+                labels={"x": "X velocity, m/s", "y": "Count"},
+            )
+            figure.update_layout(showlegend=False, bargap=0.1)
+            st.plotly_chart(figure, key="end_x")
+
+            figure = px.histogram(
+                x=calculator.get_molecule_speeds_y(),
+                nbins=60,
+                color_discrete_sequence=["#00bb54"],
+                title="Maxwell distribution (Y)",
+                labels={"x": "Y velocity, m/s", "y": "Count"},
+            )
+            figure.update_layout(showlegend=False, bargap=0.1)
+            st.plotly_chart(figure, key="end_y")
+
+            figure = px.histogram(
+                x=calculator.get_molecule_heights(),
+                nbins=60,
+                color_discrete_sequence=["#ff7f0e"],
+                title="Boltzmann distribution",
+                labels={"x": "Z coordinate, nm", "y": "Count"},
+            )
+            figure.update_layout(showlegend=False, bargap=0.1)
+            st.plotly_chart(figure, key="end_z")
