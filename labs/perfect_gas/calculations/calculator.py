@@ -2,6 +2,7 @@ from labs.model.constant import GAS_CONSTANT, g
 from labs.perfect_gas.model import Container, Experiment, Molecule
 
 from ...model.vector import Vector3D
+from .collision import collide_mollecules
 from .initialization import StartStateGenerator
 
 # avogadro without exp
@@ -113,26 +114,11 @@ class Calculator:
 
                 if 0 < distance < 2 * self.settings.radius:
                     normal = delta_pos / distance
-
                     if (mol2.velocity - mol1.velocity) @ normal > 0:
                         continue
 
+                    collide_mollecules(mol1, mol2, normal, self.settings.radius)
                     self.hit_inner_count += 1
-
-                    projection_first = normal * (normal @ mol1.velocity)
-                    projection_second = normal * (normal @ mol2.velocity)
-
-                    complement_first = mol1.velocity - projection_first
-                    complement_second = mol2.velocity - projection_second
-
-                    mol1.velocity = complement_first + projection_second
-                    mol2.velocity = complement_second + projection_first
-
-                    overlap = 2 * self.settings.radius - distance
-                    if overlap > 0:
-                        separation = normal * (overlap * 0.5)
-                        mol1.position -= separation
-                        mol2.position += separation
 
     @property
     def temperature(self) -> float:
