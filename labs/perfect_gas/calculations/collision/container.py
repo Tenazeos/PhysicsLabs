@@ -17,7 +17,7 @@ def collide_with_wall(wall: Wall, molecule: Molecule, molar_mass: float) -> None
 
 def share_energy(
     local_wall_velocity: Vector3D, wall: Wall, molecule: Molecule, molar_mass: float
-) -> None:
+) -> bool:
     previous_molecule_velocity = molecule.velocity
 
     main_projection = (molecule.velocity @ wall.surface_norm) * wall.surface_norm
@@ -25,14 +25,16 @@ def share_energy(
 
     new_molecule_velocity = 2 * local_wall_velocity - main_projection + complement
     transfered_energy = (
-        molar_mass * (molecule.velocity.norm**2 - previous_molecule_velocity.norm**2) / 2
+        molar_mass * (new_molecule_velocity.norm**2 - previous_molecule_velocity.norm**2) / 2
     )
 
     if transfered_energy > wall.energy:
         heat_the_wall(wall, molecule, molar_mass)
+        return False
 
     wall.energy -= transfered_energy
     molecule.velocity = new_molecule_velocity
+    return True
 
 
 def heat_the_wall(wall: Wall, molecule: Molecule, molar_mass: float) -> None:

@@ -79,14 +79,15 @@ def page() -> None:
             help="Height to base side length",
         )
 
-        enable_gravity = st.checkbox("Enable gravity", value=False)
+        enable_gravity = st.checkbox("Enable gravity", value=True)
         enable_internal_collisions = st.checkbox("Enable internal collisions", value=False)
 
         steps = st.slider(
             "Simulation steps",
-            min_value=10,
-            max_value=1000,
-            value=100,
+            min_value=100,
+            max_value=10000,
+            value=1000,
+            step=100,
         )
 
         run_simulation = st.button(
