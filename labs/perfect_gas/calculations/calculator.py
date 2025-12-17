@@ -214,7 +214,7 @@ class Calculator:
         return [molecule.position.z for molecule in self.molecules]
 
     def get_molecule_speeds_x(self) -> list[float]:
-        return [molecule.velocity.x for molecule in self.molecules]
+        return [abs(molecule.velocity.x) for molecule in self.molecules]
 
     def get_molecule_speeds_y(self) -> list[float]:
-        return [molecule.velocity.y for molecule in self.molecules]
+        return [abs(molecule.velocity.y) for molecule in self.molecules]
