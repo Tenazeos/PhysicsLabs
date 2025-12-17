@@ -2,54 +2,128 @@
 import streamlit as st
 from plotly import express as px
 
+from labs.model.constant import g
+from labs.util.formatting import scientific_superscript, superscript_digits
+
 from .calculations import Calculator, random_place
+from .calculations.calculator import SPECIAL_AVOGADRO
 from .model import Experiment
 from .model.container import Container
 
 
 def page() -> None:
-    st.title("Perfect Gas")
+    st.title("Perfect Gas ☁️")
 
-    st.sidebar.header("Параметры сосуда")
-    # 1e3 - conversation from centimetre to nanometre
-    container = Container(
-        length=st.sidebar.slider("Длина, микрометры", 0.1, 10.0, 1.0) * 1e3,
-        width=st.sidebar.slider("Ширина, микрометры", 0.1, 10.0, 1.0) * 1e3,
-        height=st.sidebar.slider("Высота, микрометры", 0.1, 10.0, 1.0) * 1e3,
-    )
+    with st.sidebar:
+        molecule_count = st.slider(
+            "Number of molecules",
+            min_value=500,
+            max_value=5000,
+            value=1000,
+        )
 
-    st.sidebar.header("Параметры эксперимента")
-    experiment = Experiment(
-        radius=st.sidebar.slider("Радиус молекул, нм", 0.1, 10.0, 2.0),
-        number=st.sidebar.slider("Количество молекул, штук", 500, 5000, 1000),
-        molar_mass=st.sidebar.slider("Молярная масса, г/моль", 1.0, 10.0, 4.0),
-    )
+        with st.container(horizontal=True, horizontal_alignment="distribute"):
+            concentration = st.slider(
+                "Gas concentration, per m³",
+                min_value=0.01,
+                max_value=10.0,
+                step=0.01,
+                format="%.2f",
+                value=1.0,
+            )
+            concentration_exponent = st.selectbox(
+                "<no label>",
+                options=range(21, 28),
+                index=3,  # ^24
+                format_func=lambda exp: f"×10{str(exp).translate(superscript_digits)}",
+                label_visibility="hidden",
+                width=100,
+            )
 
-    max_velocity = st.sidebar.slider(
-        "Максимальная стартовая скорость(по направлению), м/с", 100.0, 1000.0, 200.0
-    )
-    min_velocity = st.sidebar.slider(
-        "Минимальная стартовая скорость(по направлению), м/с", 100.0, 1000.0, 200.0
-    )
-    enable_gravity = st.sidebar.checkbox("Включить гравитацию")
+        experiment = Experiment(
+            molar_mass=st.slider(
+                "Molar mass, g/mol",
+                min_value=1,
+                max_value=50,
+                value=4,
+            ),
+            radius=st.slider(
+                "Molecule radius, nm",
+                min_value=0.1,
+                max_value=10.0,
+                step=0.01,
+                format="%.2f",
+                value=0.14,
+            ),
+            number=molecule_count,
+        )
 
-    steps = st.sidebar.slider("Число шагов", 10, 1000, 100)
+        min_velocity, max_velocity = st.slider(
+            "Initial molecule velocity range (per axis), m/s",
+            min_value=100.0,
+            max_value=2000.0,
+            step=0.1,
+            format="%.1f",
+            value=(600.0, 900.0),
+        )
 
-    time_delta = 2 * experiment.radius / max_velocity  # in nanoseconds
+        container_side_ratio = st.slider(
+            "Container side ratio",
+            min_value=0.1,
+            max_value=10.0,
+            step=0.1,
+            format="%.1f",
+            value=1.0,
+            help="Height to base side length",
+        )
 
-    run_simulation = st.sidebar.button("Запустить симуляцию")
+        enable_gravity = st.checkbox("Enable gravity", value=False)
+        enable_internal_collisions = st.checkbox("Enable internal collisions", value=False)
+
+        steps = st.slider(
+            "Simulation steps",
+            min_value=10,
+            max_value=1000,
+            value=100,
+        )
+
+        run_simulation = st.button(
+            "Run simulation",
+            type="primary",
+            width="stretch",
+        )
+
+        # in nm³
+        volume = (molecule_count / concentration) * (10 ** (27 - concentration_exponent))
+        base_length = (volume / container_side_ratio) ** (1 / 3)
+        container = Container(
+            length=base_length,
+            width=base_length,
+            height=base_length * container_side_ratio,
+        )
+
+        time_delta = 2 * experiment.radius / max_velocity  # in nanoseconds
+
+        with st.expander("Calculated parameters", expanded=True):
+            st.html(f"Container base side length: <b>{container.length:.2f} nm</b>")
+            st.html(f"Container height: <b>{container.height:.2f} nm</b>")
+
+        with st.expander("Constants used"):
+            st.html(f"g = {g} m/s<sup>2</sup>")
+            st.html(f"N<sub>A</sub> = {SPECIAL_AVOGADRO}×10<sup>23</sup> molecules/mol")
 
     calculator: Calculator = Calculator(
         container=container,
         settings=experiment,
         generator=random_place(min_velocity, max_velocity, experiment.number, container),
         enable_gravity=enable_gravity,
+        enable_internal_collisions=enable_internal_collisions,
     )
 
     if run_simulation:
-        st.write(
-            f"Optimal time delta: {time_delta} nanoseconds, "
-            f"total time: {time_delta * steps} nanoseconds."
+        st.html(
+            f"Optimal time delta: <b>{scientific_superscript(time_delta)} ns</b> <br>"
+            f"Total time: <b>{scientific_superscript(time_delta * steps)} ns</b>"
         )
 
         start_vel = [m.velocity.norm for m in calculator.molecules]
@@ -62,31 +136,39 @@ def page() -> None:
             progress_bar.progress((step + 1) / steps)
             status_text.text(f"Шаг: {step + 1}/{steps}")
 
-        col1, col2 = st.columns(2)
-        with col1:
+        with st.container(horizontal=True, horizontal_alignment="center", gap="large"):
             st.metric(
-                label="Температура, мили Кельвины",
-                value=calculator.temperature,
+                "Temperature",
+                f"{calculator.temperature:.2f} K",
+                width="content",
             )
 
             st.metric(
-                label="Давление, мили Паскали",
-                value=calculator.pressure,
+                "Collisions with walls",
+                calculator.hit_with_wall_count,
+                width="content",
+            )
+            st.metric(
+                "Internal collisions",
+                calculator.hit_inner_count,
+                width="content",
             )
 
-        with col2:
-            st.metric(label="Количество внутренних столкновений", value=calculator.hit_inner_count)
-            st.metric(
-                label="Количество столкновений со стеной", value=calculator.hit_with_wall_count
-            )
+        with st.container(horizontal=True, horizontal_alignment="center", gap="large"):
+            for side, pressure in calculator.pressures.items():
+                st.metric(
+                    f"Pressure: {side}",
+                    f"{pressure:.2f} Pa",
+                    width="content",
+                )
 
         col1, col2 = st.columns(2)
 
         with col1:
             fig = px.histogram(
                 x=start_vel,
-                title="Начальное распределение модулей скоростей",
-                labels={"x": "Модуль скорости, м/с", "y": "Количество молекул"},
+                title="Velocity module distribution at the start",
+                labels={"x": "Velocity module, m/s", "y": "Count"},
             )
             fig.update_layout(showlegend=False, bargap=0.1)
 
@@ -95,8 +177,8 @@ def page() -> None:
         with col2:
             fig = px.histogram(
                 x=[m.velocity.norm for m in calculator.molecules],
-                title="Конечное распределение модулей скоростей",
-                labels={"x": "Модуль скорости, м/с", "y": "Количество молекул"},
+                title="Velocity module distribution at the end",
+                labels={"x": "Velocity module, м/с", "y": "Count"},
             )
             fig.update_layout(showlegend=False, bargap=0.1)
 

@@ -23,13 +23,15 @@ class Calculator:
         generator: StartStateGenerator,
         *,
         enable_gravity: bool,
+        enable_internal_collisions: bool,
     ) -> None:
         self.container = container
         self.settings = settings
         self.molecules = list(generator)
-        self.molecule_mass = settings.molar_mass / (1e23 * SPECIAL_AVOGADRO)  # gramms
+        self.molecule_mass = settings.molar_mass / (1e23 * SPECIAL_AVOGADRO)  # grams
 
         self.enable_gravity = enable_gravity
+        self.enable_internal_collisions = enable_internal_collisions
 
         self.delta_vel_per_wall = {
             "x+": 0.0,
@@ -60,7 +62,9 @@ class Calculator:
     def step(self, time_delta: float) -> None:
         self._process_movement(time_delta)
         self._process_container_collisions()
-        self._process_inner_collision()
+
+        if self.enable_internal_collisions:
+            self._process_inner_collision()
 
         self.current_time += time_delta
 
@@ -148,54 +152,61 @@ class Calculator:
 
         average_square_velocity /= len(self.molecules)
 
-        # millikelvins
-        return self.settings.molar_mass * average_square_velocity / (3 * GAS_CONSTANT)
+        # kelvins
+        return self.settings.molar_mass * average_square_velocity / (3 * GAS_CONSTANT) / 1e3
 
     @property
-    def pressure(self) -> float:
+    def pressures(self) -> dict[str, float]:
+        # Pa * 10^-2
         pressures = {
-            "x+": self.delta_vel_per_wall["x+"]
-            * self.settings.molar_mass
-            / SPECIAL_AVOGADRO
-            / self.current_time
-            / (self.container.height * self.container.width),
-            "x-": self.delta_vel_per_wall["x-"]
-            * self.settings.molar_mass
-            / SPECIAL_AVOGADRO
-            / self.current_time
-            / (self.container.height * self.container.width),
-            "y+": self.delta_vel_per_wall["y+"]
-            * self.settings.molar_mass
-            / SPECIAL_AVOGADRO
-            / self.current_time
-            / (self.container.length * self.container.height),
-            "y-": self.delta_vel_per_wall["y-"]
-            * self.settings.molar_mass
-            / SPECIAL_AVOGADRO
-            / self.current_time
-            / (self.container.length * self.container.height),
-            "z+": self.delta_vel_per_wall["z+"]
-            * self.settings.molar_mass
-            / SPECIAL_AVOGADRO
-            / self.current_time
-            / (self.container.length * self.container.width),
-            "z-": self.delta_vel_per_wall["z-"]
-            * self.settings.molar_mass
-            / SPECIAL_AVOGADRO
-            / self.current_time
-            / (self.container.length * self.container.width),
+            "x+": (
+                self.delta_vel_per_wall["x+"]
+                * self.settings.molar_mass
+                / SPECIAL_AVOGADRO
+                / self.current_time
+                / (self.container.height * self.container.width)
+            ),
+            "x-": (
+                self.delta_vel_per_wall["x-"]
+                * self.settings.molar_mass
+                / SPECIAL_AVOGADRO
+                / self.current_time
+                / (self.container.height * self.container.width)
+            ),
+            "y+": (
+                self.delta_vel_per_wall["y+"]
+                * self.settings.molar_mass
+                / SPECIAL_AVOGADRO
+                / self.current_time
+                / (self.container.length * self.container.height)
+            ),
+            "y-": (
+                self.delta_vel_per_wall["y-"]
+                * self.settings.molar_mass
+                / SPECIAL_AVOGADRO
+                / self.current_time
+                / (self.container.length * self.container.height)
+            ),
+            "z+": (
+                self.delta_vel_per_wall["z+"]
+                * self.settings.molar_mass
+                / SPECIAL_AVOGADRO
+                / self.current_time
+                / (self.container.length * self.container.width)
+            ),
+            "z-": (
+                self.delta_vel_per_wall["z-"]
+                * self.settings.molar_mass
+                / SPECIAL_AVOGADRO
+                / self.current_time
+                / (self.container.length * self.container.width)
+            ),
         }
 
-        # millipascals
-        return (
-            10
-            * (
-                pressures["x+"]
-                + pressures["x-"]
-                + pressures["y+"]
-                + pressures["y-"]
-                + pressures["z+"]
-                + pressures["z-"]
-            )
-            / 6
-        )
+        return {
+            "top": pressures["z+"] / 1e2,
+            "bottom": pressures["z-"] / 1e2,
+            "sides": (
+                (pressures["x+"] + pressures["x-"] + pressures["y+"] + pressures["y-"]) / 4 / 1e2
+            ),
+        }
