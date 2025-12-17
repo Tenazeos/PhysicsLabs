@@ -82,6 +82,8 @@ class Calculator:
             molecule.position += molecule.velocity * time_delta
 
     def _process_container_collisions(self) -> None:
+        # st.write(sum(wall.energy for wall in self.walls.values()))
+
         for molecule in self.molecules:
             if molecule.position.x - self.settings.radius <= 0:
                 self.delta_vel_per_wall["x-"] += abs(molecule.velocity.x)

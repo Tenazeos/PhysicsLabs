@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from labs.model.constant import AVOGADRO
 from labs.model.vector import Vector3D
 
 from .orientation import SurfacePosition, surface_norm_by_position
@@ -25,7 +26,7 @@ class Wall:
 
     @property
     def velocity(self) -> Vector3D:
-        return np.sqrt(2 * self.energy / self.mass) * self.surface_norm
+        return np.sqrt(2 * self.energy * AVOGADRO / self.mass) * self.surface_norm
 
     @property
     def surface_norm(self) -> Vector3D:
