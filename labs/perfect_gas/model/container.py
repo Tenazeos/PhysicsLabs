@@ -26,7 +26,7 @@ class Wall:
 
     @property
     def velocity(self) -> Vector3D:
-        return np.sqrt(2 * self.energy * AVOGADRO / self.mass) * self.surface_norm
+        return np.sqrt(2 * self.energy / self.mass / AVOGADRO) * self.surface_norm
 
     @property
     def surface_norm(self) -> Vector3D:

@@ -75,7 +75,7 @@ class Calculator:
                     Vector3D(
                         x=0.0,
                         y=0.0,
-                        z=-(g * 1e-9),
+                        z=-g * 1e-9,
                     )
                     * time_delta
                 )

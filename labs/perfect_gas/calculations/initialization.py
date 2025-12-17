@@ -15,9 +15,9 @@ def random_place(
     for _ in range(number):
         yield Molecule(
             velocity=Vector3D(
-                x=random.uniform(min_velocity, max_velocity),
-                y=random.uniform(min_velocity, max_velocity),
-                z=random.uniform(min_velocity, max_velocity),
+                x=random.uniform(min_velocity, max_velocity) * random.choice((-1, 1)),
+                y=random.uniform(min_velocity, max_velocity) * random.choice((-1, 1)),
+                z=random.uniform(min_velocity, max_velocity) * random.choice((-1, 1)),
             ),
             position=Vector3D(
                 x=random.uniform(0, container.length),
