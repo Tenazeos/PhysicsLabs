@@ -21,6 +21,9 @@ dev = [
     "ruff>=0.14.3",
     "watchdog>=6.0.0",
 ]
+research = [
+    "jupyter>=1.1.1",
+]
 
 
 [tool.ruff]
