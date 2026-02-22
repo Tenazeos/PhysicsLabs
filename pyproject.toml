@@ -23,7 +23,10 @@ dev = [
     "watchdog>=6.0.0",
 ]
 research = [
+    {include-group = "dev"},
     "jupyter>=1.1.1",
+    "matplotlib>=3.10.8",
+    "seaborn>=0.13.2",
 ]
 
 
@@ -76,6 +79,9 @@ select = [
     "YTT", # flake8-2020
 ]
 ignore = [
+    "RUF002", # allow non-ASCII characters (in docs)
+    "RUF003", # allow non-ASCII characters (in docs)
+    "D205", # allow multi-line docstring summaries
     "COM812", # redundant because of ruff format
     "D1", # allow undocumented entities
     "D212", # prefer D213 instead (google doc style override)
