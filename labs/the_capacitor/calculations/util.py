@@ -9,13 +9,13 @@ def get_capacity(charge: np.ndarray, capacitor: Capacitor) -> float:
     return abs(np.sum(charge[:max_index])) / capacitor.voltage
 
 
-def generate_capacitor_chunks_vectors(capacitor: Capacitor) -> np.ndarray:
-    upper_plate = _generate_plate_vectors(capacitor.upper_plate, capacitor.distance)
-    lower_plate = _generate_plate_vectors(capacitor.lower_plate, 0.0)
+def generate_capacitor_chunks_vector(capacitor: Capacitor) -> np.ndarray:
+    upper_plate = _generate_plate_vector(capacitor.upper_plate, capacitor.distance)
+    lower_plate = _generate_plate_vector(capacitor.lower_plate, 0.0)
     return np.vstack([lower_plate, upper_plate])
 
 
-def _generate_plate_vectors(plate: Plate, z_coord: float) -> np.ndarray:
+def _generate_plate_vector(plate: Plate, z_coord: float) -> np.ndarray:
     x_coords = np.arange(plate.length_chunk_count) * plate.chunk_side + (plate.chunk_side / 2)
     y_coords = np.arange(plate.width_chunk_count) * plate.chunk_side + (plate.chunk_side / 2)
 

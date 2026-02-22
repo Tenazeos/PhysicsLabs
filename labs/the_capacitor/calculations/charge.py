@@ -12,7 +12,7 @@ def calculate_charge(capacitor: Capacitor) -> np.ndarray:
 
     :return: Charges on each chunk in the same order as the chunks vector.
     """
-    chunks = capacitor.chunk_vectors
+    chunks = capacitor.chunks_vector
     n = chunks.shape[0]
 
     distances = spatial.distance_matrix(chunks, chunks)

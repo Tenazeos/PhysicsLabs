@@ -5,7 +5,7 @@ from functools import cached_property
 
 import numpy as np
 
-from labs.the_capacitor.calculations.util import generate_capacitor_chunks_vectors
+from labs.the_capacitor.calculations.util import generate_capacitor_chunks_vector
 
 
 @dataclass
@@ -17,8 +17,8 @@ class Capacitor:
     voltage: float
 
     @cached_property
-    def chunk_vectors(self) -> np.ndarray:
-        return generate_capacitor_chunks_vectors(self)
+    def chunks_vector(self) -> np.ndarray:
+        return generate_capacitor_chunks_vector(self)
 
 
 @dataclass
