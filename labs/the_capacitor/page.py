@@ -15,7 +15,7 @@ def page() -> None:
     with st.sidebar:
         chunk_side = (
             st.slider(
-                "Plate size (mm)",
+                "Chunk side (mm)",
                 min_value=0.01,
                 max_value=1.0,
                 value=0.1,

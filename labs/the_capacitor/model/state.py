@@ -1,6 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import cached_property
+
+import numpy as np
+
+from labs.the_capacitor.calculations.util import generate_capacitor_chunks_vectors
 
 
 @dataclass
@@ -10,6 +15,10 @@ class Capacitor:
 
     distance: float
     voltage: float
+
+    @cached_property
+    def chunk_vectors(self) -> np.ndarray:
+        return generate_capacitor_chunks_vectors(self)
 
 
 @dataclass

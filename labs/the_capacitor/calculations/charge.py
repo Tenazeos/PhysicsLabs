@@ -4,7 +4,6 @@ import numpy as np
 from scipy import linalg, spatial
 
 from ..model import Capacitor
-from .util import generate_capacitor_plates_vector
 
 
 def calculate_charge(capacitor: Capacitor) -> np.ndarray:
@@ -13,7 +12,7 @@ def calculate_charge(capacitor: Capacitor) -> np.ndarray:
 
     :return: Charges on each chunk in the same order as the chunks vector.
     """
-    chunks = generate_capacitor_plates_vector(capacitor)
+    chunks = capacitor.chunk_vectors
     n = chunks.shape[0]
 
     distances = spatial.distance_matrix(chunks, chunks)

@@ -20,10 +20,10 @@ def main_page() -> None:
     )
 
 
-pages = [
-    st.Page(main_page, title="Info", icon=":material/info:", default=True),
-    *lab_pages,
-]
+pages = {
+    "": [st.Page(main_page, title="Info", icon=":material/info:", default=True)],
+    **lab_pages,
+}
 
 nav = st.navigation(pages, position="sidebar", expanded=True)
 nav.run()

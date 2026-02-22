@@ -1,7 +1,6 @@
 import numpy as np
 
 from ..model import Capacitor
-from .util import generate_capacitor_plates_vector
 
 
 class ElectricFieldStrength:
@@ -9,11 +8,11 @@ class ElectricFieldStrength:
 
     def __init__(self, charge: np.ndarray, capacitor: Capacitor) -> None:
         self.charge = charge
-        self.chunk_coordinates = generate_capacitor_plates_vector(capacitor)
+        self.chunk_vectors = capacitor.chunk_vectors
 
     def __call__(self, point: np.ndarray) -> np.ndarray:
-        distance = self.chunk_coordinates - point
+        distances = self.chunk_vectors - point
 
-        strength_norm = np.pow(np.linalg.norm(distance, axis=1), -3) * self.charge
+        strength_norm = np.pow(np.linalg.norm(distances, axis=1), -3) * self.charge
 
-        return np.sum(strength_norm[:, np.newaxis] * distance, axis=0)
+        return np.sum(strength_norm[:, np.newaxis] * distances, axis=0)
