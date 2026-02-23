@@ -20,16 +20,20 @@ def test_electric_field_is_vertical_at_center_of_plate(capacitor: Capacitor, cha
     # На самом деле это tg(alpha) := max(x, y) / z на компонентах векторного поля
     subcapacitor, lower_charge, upper_charge = extract_central_area(capacitor, charge)
 
-    center_field = ElectricFieldStrength(subcapacitor, np.concatenate([lower_charge, upper_charge]))
-    grid = subcapacitor.chunks_vector[: subcapacitor.lower_plate.chunk_count] + np.array(
-        [[0, 0, 0.25]]
-    )
-    f = np.array([center_field(point) for point in grid])
-    metric = np.max((f[:, 0], f[:, 1])) / f[:, 2]
+    # Проверим вертикальность по всей высоте между обкладками
+    for distance_coef in np.arange(0.1, 1, 0.1):
+        center_field = ElectricFieldStrength(
+            subcapacitor, np.concatenate([lower_charge, upper_charge])
+        )
+        grid = subcapacitor.chunks_vector[: subcapacitor.lower_plate.chunk_count] + np.array(
+            [[0, 0, subcapacitor.distance * distance_coef]]
+        )
+        f = np.array([center_field(point) for point in grid])
+        metric = np.max((f[:, 0], f[:, 1])) / f[:, 2]
 
-    assert np.count_nonzero(metric < 0.02) / metric.shape[0] > 0.98, (
-        "Electric field is not vertical enough at the center of the plate"
-    )
+        assert np.count_nonzero(metric < 0.02) / metric.shape[0] > 0.98, (
+            "Electric field is not vertical enough at the center of the plate"
+        )
 
 
 def test_capacity_of_central_area_is_close_to_theoretical(capacitor: Capacitor, charge: np.ndarray):
