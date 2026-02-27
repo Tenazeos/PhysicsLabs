@@ -85,6 +85,8 @@ uv run jupyter notebook --autoreload
 
 Open any `.ipynb` file in your IDE and setup a kernel using option "use existing jupyter server". Pass the connection link here.
 
+If you are strugling with running the notebook – simply move it to the project root and try again!
+
 ## Development guide
 
 ```shell

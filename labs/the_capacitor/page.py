@@ -2,7 +2,7 @@ import streamlit as st
 
 from labs.model.constant import c
 
-from .model.state import Capacitor, Plate
+from .model import RectCapacitor, RectPlate
 
 volt_to_statvolt_coef = 1 / (c / 1e6)
 
@@ -74,13 +74,13 @@ def page() -> None:
             * volt_to_statvolt_coef
         )
 
-        st.session_state.capacitor = Capacitor(
-            upper_plate=Plate(
+        st.session_state.capacitor = RectCapacitor(
+            upper_plate=RectPlate(
                 length=upper_plate_length,
                 width=upper_plate_width,
                 chunk_side=chunk_side,
             ),
-            lower_plate=Plate(
+            lower_plate=RectPlate(
                 length=lower_plate_length,
                 width=lower_plate_width,
                 chunk_side=chunk_side,
