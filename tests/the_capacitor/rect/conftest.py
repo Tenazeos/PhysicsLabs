@@ -7,7 +7,7 @@ from labs.the_capacitor.calculations.charge import calculate_charge
 from labs.the_capacitor.model import RectCapacitor, RectPlate
 
 
-@pytest.fixture(scope="session", params=[[40, 0.4], [50, 0.5], [60, 0.6]])
+@pytest.fixture(scope="session", params=[[50, 0.5], [50, 5], [50, 25]])
 def capacitor(request) -> RectCapacitor:
     side, distance = request.param
     plate = RectPlate(

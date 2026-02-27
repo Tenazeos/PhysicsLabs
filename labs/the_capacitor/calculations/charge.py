@@ -20,5 +20,6 @@ def calculate_charge(capacitor: Capacitor) -> np.ndarray:
     denominator = distances + np.eye(n)
     inversed_distances = numerator / denominator
 
-    voltage = (chunks[:, 2] > 0) * capacitor.voltage
+    # Split the voltage between plates, +-V/2 on each plate
+    voltage = ((chunks[:, 2] > 0) - 0.5) * capacitor.voltage
     return linalg.solve(inversed_distances, voltage)
