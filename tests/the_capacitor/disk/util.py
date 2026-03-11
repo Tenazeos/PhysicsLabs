@@ -4,9 +4,9 @@ from labs.the_capacitor.model import DiskCapacitor, DiskPlate
 
 
 def extract_central_disk(
-    capacitor: DiskCapacitor, charge: np.ndarray
+    capacitor: DiskCapacitor, charge: np.ndarray, relative_radius: float = 0.5
 ) -> tuple[DiskCapacitor, np.ndarray, np.ndarray]:
-    central_radius = capacitor.lower_plate.radius / 2
+    central_radius = capacitor.lower_plate.radius * relative_radius
 
     new_lower_plate = DiskPlate(radius=central_radius, dr=capacitor.lower_plate.dr)
     new_upper_plate = DiskPlate(radius=central_radius, dr=capacitor.upper_plate.dr)
