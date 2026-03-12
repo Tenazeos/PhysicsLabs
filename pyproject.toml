@@ -10,6 +10,7 @@ dependencies = [
     "pandas>=2.3.3",
     "plotly>=6.5.2",
     "scipy>=1.17.0",
+    "sns",
     "streamlit>=1.54.0",
 ]
 

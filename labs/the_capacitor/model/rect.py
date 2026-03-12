@@ -5,7 +5,7 @@ from functools import cached_property
 
 import numpy as np
 
-from .util.rect import generate_rect_capacitor_chunks_vector
+from .util.rect import generate_rect_capacitor_chunks_vector, generate_rect_plate_vector
 
 
 @dataclass
@@ -27,6 +27,28 @@ class RectCapacitor:
     @cached_property
     def chunks_vector(self) -> np.ndarray:
         return generate_rect_capacitor_chunks_vector(self)
+
+    @cached_property
+    def covering_chunks_at_zero_height(self) -> np.ndarray:
+        excess_coef = 0.4  # +20% on each side
+
+        max_side = max(
+            self.lower_plate.length,
+            self.upper_plate.length,
+            self.lower_plate.width,
+            self.upper_plate.width,
+        )
+        excess_size = round(excess_coef * max_side / self.chunk_side) * self.chunk_side
+
+        unshifted = generate_rect_plate_vector(
+            RectPlate(
+                length=max(self.lower_plate.length, self.upper_plate.length) + excess_size,
+                width=max(self.lower_plate.width, self.upper_plate.width) + excess_size,
+                chunk_side=self.chunk_side,
+            ),
+            z_coord=0,
+        )
+        return unshifted - np.array([[excess_size / 2, excess_size / 2, 0]])
 
 
 @dataclass

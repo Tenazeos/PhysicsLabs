@@ -1589,6 +1589,7 @@ dependencies = [
     { name = "pandas" },
     { name = "plotly" },
     { name = "scipy" },
+    { name = "sns" },
     { name = "streamlit" },
 ]
 
@@ -1620,6 +1621,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "plotly", specifier = ">=6.5.2" },
     { name = "scipy", specifier = ">=1.17.0" },
+    { name = "sns" },
     { name = "streamlit", specifier = ">=1.54.0" },
 ]
 
@@ -2368,6 +2370,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/44/cd/a040c4b3119bbe532
 wheels = [
     { url = "https://files.pythonhosted.org/packages/04/be/d09147ad1ec7934636ad912901c5fd7667e1c858e19d355237db0d0cd5e4/smmap-5.0.2-py3-none-any.whl", hash = "sha256:b30115f0def7d7531d22a0fb6502488d879e75b260a9db4d0819cfb25403af5e", size = 24303, upload-time = "2025-01-02T07:14:38.724Z" },
 ]
+
+[[package]]
+name = "sns"
+version = "0.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/58/80/d5a2a12fae635474014e7e0c88959daab3bf815648250fbb7639dd02fe50/sns-0.1.tar.gz", hash = "sha256:2d847d23eb8e0ea20054dbadabdecfafc529e4c7a16a6ce70205c4bf8ebc6cf4", size = 2089, upload-time = "2015-08-11T20:00:35.35Z" }
 
 [[package]]
 name = "soupsieve"

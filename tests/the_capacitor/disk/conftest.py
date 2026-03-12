@@ -20,10 +20,7 @@ def capacitor(request) -> DiskCapacitor:
     3. При этом, чтобы тесты считались за разумное время, мы придерживаемся радиуса около 40 точек
     """
     radius, distance, dr = request.param
-    plate = DiskPlate(
-        radius=radius,
-        dr=dr,
-    )
+    plate = DiskPlate(radius=radius, dr=dr)
     return DiskCapacitor(upper_plate=plate, lower_plate=copy(plate), distance=distance, voltage=2.0)
 
 
