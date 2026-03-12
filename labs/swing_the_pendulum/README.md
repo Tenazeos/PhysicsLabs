@@ -53,7 +53,7 @@
 
 ### Простой путь
 
-Достаточно просто зайти на [hsse-physics-labs.streamlit.app](https://hsse-physics-labs.streamlit.app) — там уже все развернуто!
+Достаточно просто зайти на [сайт](https://hsse-physics-labs.tadpole-sirius.ts.net) — там уже все развернуто!
 
 ### Локально
 

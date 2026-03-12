@@ -2,7 +2,7 @@
 
 ## About
 
-You can find [here](https://hsse-physics-labs.streamlit.app/) the interactive labs (experiment simulations), play with parameters and enjoy materialized results!
+You can find [here](https://hsse-physics-labs.tadpole-sirius.ts.net) the interactive labs (experiment simulations), play with parameters and enjoy materialized results!
 
 Each page represents a separate lab, where you can find experiment description, limits of applicability, and the
 playground itself.
@@ -10,7 +10,7 @@ playground itself.
 
 ## Contents
 
-Try out interactive labs **right now**, on our [website](https://hsse-physics-labs.streamlit.app/)!
+Try out interactive labs **right now**, on our [website](https://hsse-physics-labs.tadpole-sirius.ts.net)!
 
 _Autumn semester:_
 
