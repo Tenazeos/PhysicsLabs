@@ -6,12 +6,13 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "altair>=6.0.0",
-    "numpy>=2.4.2",
+    "matplotlib>=3.10.8",
+    "numpy>=2.4.3",
     "pandas>=2.3.3",
-    "plotly>=6.5.2",
-    "scipy>=1.17.0",
-    "sns",
-    "streamlit>=1.54.0",
+    "plotly>=6.6.0",
+    "scipy>=1.17.1",
+    "seaborn>=0.13.2",
+    "streamlit>=1.55.0",
 ]
 
 [dependency-groups]
@@ -19,15 +20,13 @@ dev = [
     "pre-commit>=4.5.1",
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
-    "ruff>=0.15.2",
-    "scipy-stubs>=1.17.0.2",
+    "ruff>=0.15.5",
+    "scipy-stubs>=1.17.1.1",
     "watchdog>=6.0.0",
 ]
 research = [
     {include-group = "dev"},
     "jupyter>=1.1.1",
-    "matplotlib>=3.10.8",
-    "seaborn>=0.13.2",
 ]
 
 
