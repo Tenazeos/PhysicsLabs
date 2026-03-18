@@ -4,7 +4,7 @@ from functools import cached_property
 import numpy as np
 
 
-@dataclass(slots=True)
+@dataclass
 class SegmentedRing:
     segment_count: int
     radius: float
@@ -24,7 +24,7 @@ class SegmentedRing:
         return np.diff(self.points, axis=0, append=self.points[0:1])
 
 
-@dataclass(slots=True)
+@dataclass
 class MagneticTrap:
     upper_ring: SegmentedRing
     lower_ring: SegmentedRing

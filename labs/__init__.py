@@ -6,6 +6,7 @@ from .flight_to_mars import page as flight_to_mars_page
 from .roll_the_ball import page as roll_the_ball_page
 from .swing_the_pendulum import page as swing_the_pendulum_page
 from .throw_a_rock import page as throw_a_rock_page
+from .magnetic_trap import page as magnetic_trap_page
 
 pages = [
     st.Page(
@@ -32,4 +33,9 @@ pages = [
         icon="🦯",
         url_path="swing-the-pendulum",
     ),
+    st.Page(
+        magnetic_trap_page,
+        title="Magnetic trap",
+        url_path="magnetic-trap",
+    )
 ]
