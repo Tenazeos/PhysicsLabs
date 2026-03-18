@@ -28,4 +28,4 @@ class SegmentedRing:
 class MagneticTrap:
     upper_ring: SegmentedRing
     lower_ring: SegmentedRing
-    current_strength: float
+    current: float
