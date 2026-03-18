@@ -79,8 +79,7 @@ uv sync --group research
 Run jupyter notebook server from the root project dir. This will yield connection link in the terminal. Then, you can run experiments in any notebook `tests/<lab>/*`
 
 ```shell
-uv run jupyter notebook --autoreload 
---no-browser
+uv run jupyter notebook --autoreload --no-browser
 ```
 
 Open any `.ipynb` file in your IDE and setup a kernel using option "use existing jupyter server". Pass the connection link here.
