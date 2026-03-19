@@ -6,9 +6,9 @@ import numpy as np
 
 @dataclass
 class SegmentedRing:
-    segment_count: int
     radius: float
     z_cord: float
+    segment_count: int
 
     @cached_property
     def points(self) -> np.ndarray:

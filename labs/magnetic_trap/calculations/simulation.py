@@ -13,17 +13,15 @@ class MovementProcessor:
         self.upper_field = MagneticFieldFromRing(trap.upper_ring, trap.current)
         self.lower_field = MagneticFieldFromRing(trap.lower_ring, trap.current)
 
-        self.inner_coefficient_ = particle.charge / particle.weight
+        self._inner_coefficient = particle.charge / particle.mass
 
-        self.ode = ode(
-            f=self._inner,
-        ).set_initial_value(self.state.velocity)
+        self.ode = ode(f=self._inner).set_initial_value(self.state.velocity)
 
     def _inner(self, _time: float, velocity: np.ndarray) -> np.ndarray:
         magnetic_induction = self.lower_field(self.state.position) + self.upper_field(
             self.state.position
         )
-        return np.cross(velocity, magnetic_induction) * self.inner_coefficient_
+        return np.cross(velocity, magnetic_induction) * self._inner_coefficient
 
     def process(self, time_delta: float) -> None:
         new_velocity = self.ode.integrate(self.ode.t + time_delta)

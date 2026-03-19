@@ -5,70 +5,131 @@ import streamlit as st
 from .calculations import MovementProcessor
 from .models import MagneticTrap, Particle, SegmentedRing, State
 
+TIME_DELTA = 0.01
+FRAME_COUNT = 1000
+RING_SEGMENT_COUNT = 50
+
+SI_TO_SGSM_COEF = 0.1  # for amperes and coulombs
+
 
 def page() -> None:
-    st.write("Debug")
+    st.set_page_config(page_title="Magnetic trap 🧲", page_icon="🧲", layout="wide")
 
-    distances = st.sidebar.slider("Distance between ring", 1.0, 10.0, 2.0)
-    radius = st.sidebar.slider("Radius of ring", 1.0, 10.0, 2.0)
-    current = st.sidebar.slider("Current of ring", 1.0, 10.0, 2.0)
-    segment_count = st.sidebar.slider("Number of segments", 10, 100, 20)
+    st.title("Magnetic trap 🧲")
 
-    weight = st.sidebar.slider("Weight of particle", 1.0, 10.0, 2.0)
-    charge = st.sidebar.slider("Charge of particle", -10.0, 10.0, 1.0)
+    with st.sidebar:
+        ring_radius = st.slider(
+            "Ring radius (cm)",
+            min_value=1.0,
+            max_value=10.0,
+            value=4.0,
+            step=0.01,
+        )
+        ring_distance = st.slider(
+            "Distance between rings (cm)",
+            min_value=1.0,
+            max_value=10.0,
+            value=4.0,
+            step=0.01,
+        )
+        ring_current = (
+            st.slider(
+                "Electric current in rings (A)",
+                min_value=1.0,
+                max_value=10.0,
+                value=5.0,
+                step=0.01,
+            )
+            * SI_TO_SGSM_COEF
+        )
 
-    is_run = st.sidebar.button("Run")
+        particle_mass = (
+            st.slider(
+                "Particle mass (mg)",
+                min_value=10.0,
+                max_value=1000.0,
+                value=100.0,
+                step=0.1,
+            )
+            / 1000
+        )
+        particle_charge = (
+            st.slider(
+                "Particle charge (C)",
+                min_value=-10.0,
+                max_value=10.0,
+                value=3.0,
+                step=0.01,
+            )
+            * SI_TO_SGSM_COEF
+        )
+        particle_launch_angle = st.slider(
+            "Particle launch angle (deg)",
+            min_value=-90.0,
+            max_value=90.0,
+            value=-30.0,
+            step=0.1,
+        )
 
-    if is_run:
-        trap = MagneticTrap(
+    center_between_rings = np.array([0, 0, ring_distance / 2])
+    particle_velocity_norm = 1
+    particle_velocity = np.array(
+        [
+            -particle_velocity_norm * np.cos(particle_launch_angle) / np.sqrt(2),
+            particle_velocity_norm * np.cos(particle_launch_angle) / np.sqrt(2),
+            particle_velocity_norm * np.sin(particle_launch_angle),
+        ]
+    )
+
+    movement = MovementProcessor(
+        trap=MagneticTrap(
             upper_ring=SegmentedRing(
-                radius=radius,
-                segment_count=segment_count,
-                z_cord=distances,
+                radius=ring_radius,
+                z_cord=ring_distance,
+                segment_count=RING_SEGMENT_COUNT,
             ),
             lower_ring=SegmentedRing(
-                radius=radius,
-                segment_count=segment_count,
+                radius=ring_radius,
                 z_cord=0,
+                segment_count=RING_SEGMENT_COUNT,
             ),
-            current=current,
-        )
+            current=ring_current,
+        ),
+        particle=Particle(
+            mass=particle_mass,
+            charge=particle_charge,
+        ),
+        start_state=State(
+            position=center_between_rings,
+            velocity=particle_velocity,
+        ),
+    )
 
-        start_state = State(
-            position=np.array([0.0, 0.0, distances / 2]),
-            velocity=np.array([1.0, 1.0, 0.01]),
-        )
+    states = [movement.state]
+    for _ in range(FRAME_COUNT):
+        movement.process(TIME_DELTA)
+        states.append(movement.state)
 
-        movement = MovementProcessor(
-            trap=trap,
-            particle=Particle(
-                weight=weight,
-                charge=charge,
-            ),
-            start_state=start_state,
-        )
+    fig = px.scatter_3d(
+        [
+            {
+                "x": state.position[0],
+                "y": state.position[1],
+                "z": state.position[2],
+            }
+            for state in states
+        ],
+        x="x",
+        y="y",
+        z="z",
+        size_max=10,
+        opacity=0.7,
+    )
 
-        states = []
-        time_delta = 0.1
+    fig.update_layout(
+        scene={"xaxis_title": "X", "yaxis_title": "Y", "zaxis_title": "Z"},
+        width=800,
+        height=600,
+    )
 
-        for _ in range(100):
-            movement.process(time_delta)
-
-            state = movement.state
-            states.append(
-                {
-                    "x": state.position[0],
-                    "y": state.position[1],
-                    "z": state.position[2],
-                }
-            )
-
-        fig = px.scatter_3d(states, x="x", y="y", z="z", size_max=10, opacity=0.7)
-
-        fig.update_layout(
-            scene={"xaxis_title": "X", "yaxis_title": "Y", "zaxis_title": "Z"},
-            width=800,
-            height=600,
-        )
-
-        st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
