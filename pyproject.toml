@@ -7,21 +7,21 @@ requires-python = ">=3.12"
 dependencies = [
     "altair>=6.0.0",
     "matplotlib>=3.10.8",
-    "numpy>=2.4.3",
+    "numpy>=2.4.4",
     "pandas>=2.3.3",
-    "plotly>=6.6.0",
+    "plotly>=6.7.0",
     "scipy>=1.17.1",
     "seaborn>=0.13.2",
-    "streamlit>=1.55.0",
+    "streamlit>=1.56.0",
 ]
 
 [dependency-groups]
 dev = [
     "pre-commit>=4.5.1",
-    "pytest>=9.0.2",
-    "pytest-cov>=7.0.0",
-    "ruff>=0.15.7",
-    "scipy-stubs>=1.17.1.2",
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.15.10",
+    "scipy-stubs>=1.17.1.4",
     "watchdog>=6.0.0",
 ]
 research = [
