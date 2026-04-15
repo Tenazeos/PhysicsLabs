@@ -1,15 +1,16 @@
 import math
-import statistics
 
 
 def get_mean_and_normalized(voltages: list[float]) -> tuple[float, list[float]]:
-    mean_v = statistics.mean(voltages)
+    min_v = min(voltages)
+    max_v = max(voltages)
+    mean_v = (max_v + min_v) / 2
     norm_v = [v - mean_v for v in voltages]
     return mean_v, norm_v
 
 
 def find_amplitude(norm_voltages: list[float]) -> float:
-    return max(abs(v) for v in norm_voltages)
+    return (max(norm_voltages) - min(norm_voltages)) / 2
 
 
 def find_zero_crossings(times: list[float], norm_voltages: list[float]) -> list[float]:
