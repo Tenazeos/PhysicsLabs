@@ -1,4 +1,5 @@
 # ruff: noqa: RUF001
+import math
 from dataclasses import dataclass
 from enum import Enum
 
@@ -7,9 +8,17 @@ import streamlit as st
 from labs.util.formatting import superscript_digits
 
 from .calculations import ElectricChain
-from .model import Settings, State, TunnelDiode
+from .model import Settings, TunnelDiode
 
 type ScientificPair = tuple[float, int]  # float * 10^(int)
+
+POINTS_PER_PERIOD = 50
+PERIODS_PER_CHUNK = 8
+POINTS_PER_CHUNK = POINTS_PER_PERIOD * PERIODS_PER_CHUNK
+
+
+def dynamic_sampling_delta(settings: Settings) -> float:
+    return 2 * math.pi * math.sqrt(settings.inductance * settings.capacity) / POINTS_PER_PERIOD
 
 
 @dataclass
@@ -21,10 +30,28 @@ class ParameterPresetData:
 
 
 class ParameterPreset(Enum):
-    SINUS = ParameterPresetData(
+    DEFAULT = ParameterPresetData(
         resistance=(5.0, -1),
         capacity=(1.0, -8),
         inductance=(1.0, -5),
+        electromotive_force=(1.0, 0),
+    )
+    FADING = ParameterPresetData(
+        resistance=(5.0, -1),
+        capacity=(1.0, -8),
+        inductance=(1.0, -5),
+        electromotive_force=(2.0, 0),
+    )
+    PULSE = ParameterPresetData(
+        resistance=(5.0, -1),
+        capacity=(1.0, -8),
+        inductance=(1.0, -5),
+        electromotive_force=(3.5, 0),
+    )
+    WARPED = ParameterPresetData(
+        resistance=(5.0, -1),
+        capacity=(0.5, -8),
+        inductance=(5.0, -4),
         electromotive_force=(1.0, 0),
     )
 
@@ -37,12 +64,13 @@ def page() -> None:
     with st.sidebar:
         preset: ParameterPreset = st.segmented_control(
             "Parameter preset",
-            options=list(ParameterPreset),
-            default=ParameterPreset.SINUS,
+            options=[ParameterPreset.FADING, ParameterPreset.PULSE, ParameterPreset.WARPED],
+            default=None,
             format_func=lambda preset: preset.name.replace("_", " ").capitalize(),
-            required=True,
+            required=False,
             width="stretch",
         )
+        preset = preset or ParameterPreset.DEFAULT
 
         with st.container(horizontal=True, horizontal_alignment="distribute"):
             resistance = st.slider(
@@ -115,48 +143,43 @@ def page() -> None:
         electromotive_force=electromotive_force,
         diode=TunnelDiode(),
     )
-    chain = ElectricChain(settings)
 
-    amper_chart = st.line_chart(
-        [
-            {
-                "I": 0.0,
-                "t": 0.0,
-            }
-        ],
-        x="t",
-        y="I",
-    )
-    volt_chart = st.line_chart(
-        [
-            {
-                "U": 0.0,
-                "t": 0.0,
-            }
-        ],
-        x="t",
-        y="U",
-    )
+    is_first_run = False
+    if "last_settings" not in st.session_state or st.session_state.last_settings != settings:
+        is_first_run = True
+        st.session_state.last_settings = settings
+        st.session_state.chain = ElectricChain(settings)
+        st.session_state.history = [{"time": 0.0, "amperage": 0.0, "voltage": 0.0}]
 
-    current_time = 0.0
-    for _i in range(20):
-        state: State = chain.step(0.1)
-        current_time += 0.1
+    sampling_delta = dynamic_sampling_delta(settings)
 
-        amper_chart.add_rows(
-            [
+    chart_container = st.container()
+
+    if st.button("Simulate further", type="primary") or is_first_run:
+        for _ in range(POINTS_PER_CHUNK):
+            state = st.session_state.chain.step(sampling_delta)
+            st.session_state.history.append(
                 {
-                    "I": state.amperage,
-                    "t": current_time,
+                    "time": state.time,
+                    "amperage": state.amperage,
+                    "voltage": state.voltage,
                 }
-            ]
+            )
+
+    with chart_container:
+        st.line_chart(
+            st.session_state.history,
+            x="time",
+            y="amperage",
+            x_label="Time (s)",
+            y_label="Amperage (A)",
+            color="#ff7f0e",
         )
-
-        volt_chart.add_rows(
-            [
-                {
-                    "U": state.voltage,
-                    "t": current_time,
-                }
-            ]
+        st.line_chart(
+            st.session_state.history,
+            x="time",
+            y="voltage",
+            x_label="Time (s)",
+            y_label="Voltage (V)",
+            color="#00bb54",
         )

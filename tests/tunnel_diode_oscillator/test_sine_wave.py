@@ -3,6 +3,7 @@ import math
 from labs.tunnel_diode_oscillator.calculations.electric_chain import ElectricChain
 from labs.tunnel_diode_oscillator.model.diode import TunnelDiode
 from labs.tunnel_diode_oscillator.model.settings import Settings
+from labs.tunnel_diode_oscillator.page import dynamic_sampling_delta
 from tests.tunnel_diode_oscillator.util import extract_sine_params
 
 
@@ -28,7 +29,7 @@ def test_is_sine_wave():
         resistance=0.5, capacity=1e-8, inductance=1e-5, electromotive_force=1.0, diode=TunnelDiode()
     )
 
-    time_step = 1e-7
+    time_step = dynamic_sampling_delta(settings)
     end_time = 300 * time_step
 
     times, voltages = _collect_data(settings, time_step, end_time)

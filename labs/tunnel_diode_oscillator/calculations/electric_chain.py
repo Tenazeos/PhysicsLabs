@@ -14,7 +14,7 @@ class ElectricChain:
         self.ode = (
             ode(f=self.__calculation_step)
             .set_initial_value(y=[0, 0], t=0.0)
-            .set_integrator(name="vode", method="bdf", atol=1e-6, rtol=1e-4, max_step=1e-10)
+            .set_integrator(name="vode", method="bdf", atol=1e-6, rtol=1e-4)
         )
 
     def __calculation_step(self, _: float, state: list[float]) -> list[float]:
@@ -30,4 +30,4 @@ class ElectricChain:
 
     def step(self, time_delta: float) -> State:
         amperage, voltage = self.ode.integrate(self.ode.t + time_delta)
-        return State(amperage, voltage)
+        return State(self.ode.t, amperage, voltage)

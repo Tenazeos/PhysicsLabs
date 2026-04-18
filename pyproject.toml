@@ -79,8 +79,9 @@ select = [
     "YTT", # flake8-2020
 ]
 ignore = [
-    "RUF002", # allow non-ASCII characters (in docs)
-    "RUF003", # allow non-ASCII characters (in docs)
+    "ANN401", # allow `typing.Any` in function parameters
+    "RUF002", # allow ambiduous characters (in docs)
+    "RUF003", # allow ambiduous characters (in comments)
     "D205", # allow multi-line docstring summaries
     "COM812", # redundant because of ruff format
     "D1", # allow undocumented entities
