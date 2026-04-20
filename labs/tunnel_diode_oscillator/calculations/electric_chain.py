@@ -30,4 +30,4 @@ class ElectricChain:
 
     def step(self, time_delta: float) -> State:
         amperage, voltage = self.ode.integrate(self.ode.t + time_delta)
-        return State(self.ode.t, amperage, voltage)
+        return State(time=self.ode.t, amperage=amperage, voltage=voltage)
