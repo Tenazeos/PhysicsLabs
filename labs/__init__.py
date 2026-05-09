@@ -3,6 +3,7 @@ __all__ = ["pages"]
 import streamlit as st
 
 from .flight_to_mars import page as flight_to_mars_page
+from .interference import page as interference_page
 from .magnetic_trap import page as magnetic_trap_page
 from .roll_the_ball import page as roll_the_ball_page
 from .swing_the_pendulum import page as swing_the_pendulum_page
@@ -55,6 +56,11 @@ pages = {
             title="Tunnel diode oscillator",
             icon="🔃",
             url_path="tunnel-diode-oscillator",
+        ),
+        st.Page(
+            interference_page,
+            title="Interference",
+            url_path="interference",
         ),
     ],
 }
