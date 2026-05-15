@@ -22,6 +22,9 @@ _Autumn semester:_
 _Spring semester:_
 
 - **M1. The capacitor** · [General information](labs/the_capacitor) · [Tests](tests/the_capacitor)
+- **M3. Magnetic trap** · [General information](labs/magnetic_trap) · [Tests](tests/magnetic_trap)
+- **M5. Tunnel diode oscillator** · [General information](labs/tunnel_diode_oscillator) · [Tests](tests/tunnel_diode_oscillator)
+- **M10. Interference** · [General information](labs/interference) · [Tests](tests/interference)
 
 
 ## Launch guide
