@@ -77,8 +77,7 @@ def page() -> None:
             key="preset_selector",
             on_change=apply_preset,
         )
-        if "parameter_preset_applied" not in st.session_state:
-            st.session_state.parameter_preset_applied = True
+        if "resistance_slider" not in st.session_state:
             apply_preset()
 
         with st.container(horizontal=True, horizontal_alignment="distribute"):
