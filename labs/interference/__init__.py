@@ -1,3 +1,3 @@
-from .page import page
-
 __all__ = ["page"]
+
+from .page import page

@@ -60,6 +60,7 @@ pages = {
         st.Page(
             interference_page,
             title="Interference",
+            icon="💡",
             url_path="interference",
         ),
     ],
