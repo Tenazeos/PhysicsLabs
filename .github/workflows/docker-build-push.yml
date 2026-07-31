@@ -1,6 +1,9 @@
 name: docker-build-push
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
