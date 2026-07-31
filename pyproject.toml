@@ -5,21 +5,28 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "altair>=5.5.0",
-    "numpy>=2.3.4",
+    "altair>=6.0.0",
+    "matplotlib>=3.10.8",
+    "numpy>=2.4.3",
     "pandas>=2.3.3",
-    "plotly>=6.4.0",
-    "scipy>=1.16.3",
-    "streamlit>=1.51.0",
+    "plotly>=6.6.0",
+    "scipy>=1.17.1",
+    "seaborn>=0.13.2",
+    "streamlit>=1.55.0",
 ]
 
 [dependency-groups]
 dev = [
-    "pre-commit>=4.3.0",
-    "pytest>=8.4.2",
+    "pre-commit>=4.5.1",
+    "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
-    "ruff>=0.14.3",
+    "ruff>=0.15.5",
+    "scipy-stubs>=1.17.1.1",
     "watchdog>=6.0.0",
+]
+research = [
+    {include-group = "dev"},
+    "jupyter>=1.1.1",
 ]
 
 
@@ -72,6 +79,9 @@ select = [
     "YTT", # flake8-2020
 ]
 ignore = [
+    "RUF002", # allow non-ASCII characters (in docs)
+    "RUF003", # allow non-ASCII characters (in docs)
+    "D205", # allow multi-line docstring summaries
     "COM812", # redundant because of ruff format
     "D1", # allow undocumented entities
     "D212", # prefer D213 instead (google doc style override)
