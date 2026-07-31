@@ -20,12 +20,12 @@ dev = [
     "pre-commit>=4.5.1",
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
-    "ruff>=0.15.5",
-    "scipy-stubs>=1.17.1.1",
+    "ruff>=0.15.7",
+    "scipy-stubs>=1.17.1.2",
     "watchdog>=6.0.0",
 ]
 research = [
-    {include-group = "dev"},
+    { include-group = "dev" },
     "jupyter>=1.1.1",
 ]
 

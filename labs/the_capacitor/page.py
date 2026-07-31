@@ -113,7 +113,7 @@ def rectangle_mode() -> None:
         )
         voltage = (
             st.slider(
-                "Voltage (V)",
+                "Voltage (C)",
                 min_value=0.0,
                 max_value=100.0,
                 value=30.0,
