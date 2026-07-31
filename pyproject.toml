@@ -7,21 +7,21 @@ requires-python = ">=3.12"
 dependencies = [
     "altair>=6.0.0",
     "matplotlib>=3.10.8",
-    "numpy>=2.4.3",
+    "numpy>=2.4.4",
     "pandas>=2.3.3",
-    "plotly>=6.6.0",
+    "plotly>=6.7.0",
     "scipy>=1.17.1",
     "seaborn>=0.13.2",
-    "streamlit>=1.55.0",
+    "streamlit>=1.56.0",
 ]
 
 [dependency-groups]
 dev = [
     "pre-commit>=4.5.1",
-    "pytest>=9.0.2",
-    "pytest-cov>=7.0.0",
-    "ruff>=0.15.7",
-    "scipy-stubs>=1.17.1.2",
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.15.10",
+    "scipy-stubs>=1.17.1.4",
     "watchdog>=6.0.0",
 ]
 research = [
@@ -79,8 +79,9 @@ select = [
     "YTT", # flake8-2020
 ]
 ignore = [
-    "RUF002", # allow non-ASCII characters (in docs)
-    "RUF003", # allow non-ASCII characters (in docs)
+    "ANN401", # allow `typing.Any` in function parameters
+    "RUF002", # allow ambiduous characters (in docs)
+    "RUF003", # allow ambiduous characters (in comments)
     "D205", # allow multi-line docstring summaries
     "COM812", # redundant because of ruff format
     "D1", # allow undocumented entities

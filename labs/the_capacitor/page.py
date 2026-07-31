@@ -47,6 +47,7 @@ def page() -> None:
             "Plate shape",
             options=list(ShapeMode),
             default=ShapeMode.DISK,
+            required=True,
             width="stretch",
         )
 

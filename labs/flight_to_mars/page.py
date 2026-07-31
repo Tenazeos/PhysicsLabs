@@ -60,7 +60,10 @@ def page() -> None:
 
     with st.sidebar:
         flight_stage: FlightStage | None = st.segmented_control(
-            "Flight stage", default=FlightStage.EARTH, options=list(FlightStage)
+            "Flight stage",
+            options=list(FlightStage),
+            default=FlightStage.EARTH,
+            required=True,
         )
         flight_equation_type = FlightEquationType.FIXED_ACCELERATION
 
